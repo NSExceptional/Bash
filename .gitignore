@@ -1,0 +1,26 @@
+# Whitelist mode
+/*
+!.gitignore
+
+###############
+#   Folders   #
+###############
+
+!bin
+!bash
+!.lldb
+
+###############
+#    Files    #
+###############
+               
+# Bash config files, ignore history/sessions
+!.bash*
+.bash_history
+.bash_sessions
+
+# Git config files
+!.git*
+
+# Ignore lldb-history
+.lldb/lldb-history

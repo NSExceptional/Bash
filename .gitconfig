@@ -1,0 +1,7 @@
+[user]
+	name = Tanner Bennett
+	email = tannerbennett@me.com
+[core]
+	excludesfile = ~/.gitignore_global
+[pull]
+	rebase = true

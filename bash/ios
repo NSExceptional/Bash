@@ -1,0 +1,111 @@
+alias respr="killall backboardd"
+
+sccp() {
+    local uuid=`cat .snapMediaDir`
+    local dir=/var/mobile/Containers/Data/Application/$uuid*
+
+    echo $dir/Library/Caches/tmp/
+    cd $dir/Library/Caches/tmp/
+    cp -v *.mov /var/root/
+    cp -v *.mp4 /var/root/
+    cd - > /dev/null
+
+    echo $dir/Library/Persistent/SCMedia/
+    cd $dir/Library/Persistent/SCMedia/
+    cp -v *.mov /var/root/
+    cp -v *.mp4 /var/root/
+    cd - > /dev/null
+}
+
+scrm() {
+    if [[ ! $1 ]]; then
+        echo "Missing filename"
+        return
+    fi
+
+    local uuid=`cat .snapMediaDir`
+    local dir=/var/mobile/Containers/Data/Application/$uuid*
+
+    for folder in $dir/Library/Caches/tmp $dir/Library/Persistent/SCMedia; do
+        file=$folder/*$1*
+        # echo "Searching $folder..."
+        if [[ -e $file ]]; then
+            echo "Are you sure you want to remove this file? [Y/n]"
+            echo $file
+            read yn
+            case $yn in
+                [Yy]* ) rm $folder/$1; return;;
+                * ) return;;
+            esac
+        fi
+    done
+
+    echo "File not found"
+}
+
+export PATH="$PATH":~/bin
+
+thelp() {
+    echo "respr    Respring device"
+    echo "sccp     Copies snapchat videos to /var/root"
+    echo "scrm     Removes a given video from Snapchat"
+    echo "smd      Set .snapMediaDir file to some value"
+    echo "dbg      Takes \"App.app/App\" to debug on port 12345"
+    echo "dbga     Takes PID or executable name to debug (attach)"
+    echo "app      Takes name for .app folder, prints full path"
+    echo "lp       Lists installed packages by date"
+}
+
+# Takes 'AppName'
+edbg() {
+    local app=$(app $1.app/$1)
+    echo "Target: $app"
+    local program=/Developer/usr/bin/debugserver
+    local jbc=/electra/jailbreakd_client
+    $program -x backboard 0.0.0.0:12345 $app & pid=$!
+    kill -STOP $pid
+    $jbc $pid 2
+    fg
+}
+
+# Takes PID or executable name
+edbga() {
+    local program=/Developer/usr/bin/debugserver
+    local jbc=/electra/jailbreakd_client
+    $program 0.0.0.0:12345 --attach=$1 & pid=$!
+    kill -STOP $pid
+    $jbc $pid 2
+    fg
+}
+
+# Takes App.app/App
+dbg() {
+    local target=`app $1`
+    debugserver -x backboard 0.0.0.0:12345 $target
+}
+
+# Takes PID or executable name
+dbga() {
+    debugserver 0.0.0.0:12345 --attach=$1
+}
+
+alias dump="clutch -b"
+
+alias respr="killall backboardd"
+alias refresh=". ~/.profile"
+
+app() {
+    echo /var/containers/Bundle/Application/*/$1
+}
+
+# List installed packages by date
+lp() {
+    _lp | grep -v "^gsc" | grep -v "^cy\+"
+}
+
+_lp() {
+    for file_list in `ls -c /var/lib/dpkg/info/*.list`; do \
+        stat_result=$(stat --format=%y "$file_list"); \
+        printf "%-50s %s\n" $(basename $file_list .list) "$stat_result"; \
+    done
+}
