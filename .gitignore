@@ -24,3 +24,4 @@
 
 # Ignore lldb-history
 .lldb/lldb-history
+/README.md
