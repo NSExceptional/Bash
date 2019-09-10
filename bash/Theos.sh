@@ -89,7 +89,7 @@ theoscprto() {
 
 # SSH into my device
 sshme() {
-    ssh root@$IPHONEIP -p `theospt` $1 
+    ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" root@$IPHONEIP -p `theospt` $1 
 }
 
 alias issh="theosip Tanners-iPhone.local"
